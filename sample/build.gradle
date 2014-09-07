@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId "com.mobilesolutionworks.android.facebook"
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
@@ -50,4 +50,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:19.+'
+    compile project(':works-facebook')
 }

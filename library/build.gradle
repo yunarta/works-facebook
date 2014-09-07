@@ -22,8 +22,14 @@ android {
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
+        buildConfigField "String", "MODULE_NAME", '"works-facebook"'
     }
+
     buildTypes {
+        debug {
+
+        }
+
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
