@@ -2,17 +2,24 @@
     package="com.mobilesolutionworks.android.facebook.test"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application android:label="Facebook Test">
-        <activity android:name=".FacebookTestActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".FacebookTestActivity">
+            <intent-filter>
+                <action android:name="FACEBOOK_TEST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
-        <activity android:name="com.facebook.LoginActivity"/>
+        <activity android:name="com.facebook.LoginActivity" />
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/appId" />

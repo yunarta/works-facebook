@@ -71,13 +71,28 @@ public class FacebookTestActivity extends FragmentActivity implements View.OnCli
             }
 
             case R.id.btn_request1: {
-                Request request = new Request(null, "/me", null, HttpMethod.GET, null);
-                mFacebook.request(request, new WorksFacebook.ResponseCallback() {
+                Request request = new Request(null, "/804889722866833/likes", null, HttpMethod.POST, null);
+                mFacebook.publishRequest(request, new WorksFacebook.ResponseCallback() {
                     @Override
                     public void onCancelled() {
 
                     }
 
+                    @Override
+                    public void onCompleted(Response response) {
+                        Toast.makeText(FacebookTestActivity.this, "test response = " + response, Toast.LENGTH_SHORT).show();
+                    }
+                }, "publish_actions");
+                break;
+            }
+
+            case R.id.btn_request2: {
+                Request request = new Request(null, "/804889722866833/likes", null, HttpMethod.GET, null);
+                mFacebook.readRequest(request, new WorksFacebook.ResponseCallback() {
+                    @Override
+                    public void onCancelled() {
+
+                    }
 
                     @Override
                     public void onCompleted(Response response) {
@@ -87,7 +102,7 @@ public class FacebookTestActivity extends FragmentActivity implements View.OnCli
                 break;
             }
 
-            case R.id.btn_request2: {
+            case R.id.btn_request3: {
                 mFacebook.requestMe(new WorksFacebook.ResponseCallback() {
                     @Override
                     public void onCancelled() {

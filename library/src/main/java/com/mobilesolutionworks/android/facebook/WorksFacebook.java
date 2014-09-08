@@ -49,9 +49,11 @@ public interface WorksFacebook {
      */
     void validate(WorksFacebook.Callback callback);
 
-    void request(Request request, WorksFacebook.ResponseCallback callback);
-
     void requestMe(WorksFacebook.ResponseCallback callback);
+
+    void readRequest(Request request, WorksFacebook.ResponseCallback callback, String ... newPermissions);
+
+    void publishRequest(Request request, WorksFacebook.ResponseCallback callback, String ... newPermissions);
 
     void close();
 }

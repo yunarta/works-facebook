@@ -21,12 +21,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.widget.Toast;
-import bolts.Capture;
 import bolts.Continuation;
 import bolts.Task;
 import com.facebook.*;
+import com.mobilesolutionworks.android.facebook.bolts.Ending;
+import com.mobilesolutionworks.android.facebook.bolts.Success;
+import com.mobilesolutionworks.android.facebook.bolts.Failed;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -34,24 +37,22 @@ import java.util.concurrent.Callable;
  */
 public class FacebookPluginFragment extends Fragment implements WorksFacebook {
 
-    public static final int REQUEST_CODE = 0xfb;
+    protected static final int REQUEST_CODE = 0xfb;
 
-    UiLifecycleHelper mLifecycleHelper;
-
-//    Session mSession;
+    protected UiLifecycleHelper mLifecycleHelper;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-//        if (BuildConfig.DEBUG) {
-        Settings.addLoggingBehavior(LoggingBehavior.APP_EVENTS);
-        Settings.addLoggingBehavior(LoggingBehavior.CACHE);
-        Settings.addLoggingBehavior(LoggingBehavior.DEVELOPER_ERRORS);
-        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
-        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_RAW_RESPONSES);
-        Settings.addLoggingBehavior(LoggingBehavior.REQUESTS);
-//        }
+        if (BuildConfig.DEBUG) {
+            Settings.addLoggingBehavior(LoggingBehavior.APP_EVENTS);
+            Settings.addLoggingBehavior(LoggingBehavior.CACHE);
+            Settings.addLoggingBehavior(LoggingBehavior.DEVELOPER_ERRORS);
+            Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+            Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_RAW_RESPONSES);
+            Settings.addLoggingBehavior(LoggingBehavior.REQUESTS);
+        }
 
         Session.openActiveSessionFromCache(activity);
     }
@@ -117,163 +118,159 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
 
     @Override
     public void open(@NonNull final WorksFacebook.Callback callback) {
-        checkSession().continueWithTask(new Continuation<Response, Task<Session>>() {
+        checkSession().onSuccessTask(new Continuation<Response, Task<Session>>() {
             @Override
             public Task<Session> then(Task<Response> responseTask) throws Exception {
-                Response result = responseTask.getResult();
                 return openSession(Session.getActiveSession());
             }
-        }).continueWith(new Continuation<Session, Void>() {
+        }).onSuccess(new Success<Session>() {
             @Override
-            public Void then(final Task<Session> task) throws Exception {
-                if (task.isFaulted()) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCancelled();
-                        }
-                    });
-                } else {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onSessionOpened(task.getResult());
-                        }
-                    });
-                }
-                return null;
+            public void success(final Task<Session> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onSessionOpened(task.getResult());
+                    }
+                });
+            }
+        }).continueWith(new Failed<Void>() {
+            @Override
+            public void fault(Task<Void> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCancelled();
+                    }
+                });
             }
         });
     }
 
     @Override
     public void validate(@NonNull final WorksFacebook.Callback callback) {
-        checkSession().continueWith(new Continuation<Response, Void>() {
+        checkSession().continueWith(new Ending<Response>() {
             @Override
-            public Void then(Task<Response> responseTask) throws Exception {
-                Response result = responseTask.getResult();
-                final Session session = Session.getActiveSession();
-
+            public void end(Task<Response> responseTask) throws Exception {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        callback.onSessionOpened(session);
+                        callback.onSessionOpened(Session.getActiveSession());
                     }
                 });
-//                if (session == null || session.isClosed()) {
-//                    callback.onSessionOpened(session);
-//                } else if (session.isOpened()) {
-
-//                }
-
-                return null;
             }
         });
     }
 
     @Override
-    public void request(final Request request, @NonNull final WorksFacebook.ResponseCallback callback) {
-        checkSession().continueWithTask(new Continuation<Response, Task<Session>>() {
+    public void readRequest(final Request request, @NonNull final WorksFacebook.ResponseCallback callback, final String... newPermissions) {
+        checkSession().onSuccessTask(new Continuation<Response, Task<Session>>() {
             @Override
             public Task<Session> then(Task<Response> responseTask) throws Exception {
-                Response result = responseTask.getResult();
                 return openSession(Session.getActiveSession());
             }
-        }).continueWithTask(new Continuation<Session, Task<Response>>() {
+        }).onSuccessTask(new Continuation<Session, Task<Session>>() {
+            @Override
+            public Task<Session> then(Task<Session> task) throws Exception {
+                return requestForPublish(task.getResult(), true, newPermissions);
+            }
+        }).onSuccessTask(new Continuation<Session, Task<Response>>() {
             @Override
             public Task<Response> then(Task<Session> task) throws Exception {
-                if (task.isFaulted()) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCancelled();
-                        }
-                    });
-
-                    throw new IllegalStateException();
-                } else {
-                    return makeRequest(task.getResult(), request);
-                }
+                return makeRequest(task.getResult(), request);
             }
-        }).continueWith(new Continuation<Response, Void>() {
+        }).onSuccess(new Success<Response>() {
             @Override
-            public Void then(final Task<Response> task) throws Exception {
-                if (task.isFaulted()) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCancelled();
-                        }
-                    });
-                } else {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCompleted(task.getResult());
-                        }
-                    });
-                }
-                return null;
+            public void success(final Task<Response> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCompleted(task.getResult());
+                    }
+                });
+            }
+        }).continueWith(new Success<Void>() {
+            @Override
+            public void success(Task<Void> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCancelled();
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void publishRequest(final Request request, @NonNull final WorksFacebook.ResponseCallback callback, final String... newPermissions) {
+        checkSession().onSuccessTask(new Continuation<Response, Task<Session>>() {
+            @Override
+            public Task<Session> then(Task<Response> responseTask) throws Exception {
+                return openSession(Session.getActiveSession());
+            }
+        }).onSuccessTask(new Continuation<Session, Task<Session>>() {
+            @Override
+            public Task<Session> then(Task<Session> task) throws Exception {
+                return requestForPublish(task.getResult(), true, newPermissions);
+            }
+        }).onSuccessTask(new Continuation<Session, Task<Response>>() {
+            @Override
+            public Task<Response> then(Task<Session> task) throws Exception {
+                return makeRequest(task.getResult(), request);
+            }
+        }).onSuccess(new Success<Response>() {
+            @Override
+            public void success(final Task<Response> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCompleted(task.getResult());
+                    }
+                });
+            }
+        }).continueWith(new Failed<Void>() {
+            @Override
+            public void fault(Task<Void> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCancelled();
+                    }
+                });
             }
         });
     }
 
     public void requestMe(@NonNull final WorksFacebook.ResponseCallback callback) {
-        final Request request = Request.newMeRequest(null, null);
-        final Capture<Response> successfulSaveCount = new Capture<Response>();
-
-        checkSession().continueWithTask(new Continuation<Response, Task<Session>>() {
+        checkSession().onSuccessTask(new Continuation<Response, Task<Session>>() {
             @Override
             public Task<Session> then(Task<Response> responseTask) throws Exception {
-                final Response response = responseTask.getResult();
-                if (response != null) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCompleted(response);
-                        }
-                    });
-
-                    throw new IllegalStateException();
-                }
-
                 return openSession(null);
             }
-        }).continueWithTask(new Continuation<Session, Task<Response>>() {
+        }).onSuccessTask(new Continuation<Session, Task<Response>>() {
             @Override
             public Task<Response> then(Task<Session> task) throws Exception {
-                if (task.isFaulted()) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCancelled();
-                        }
-                    });
-                    throw new IllegalStateException();
-                } else {
-                    return makeRequest(task.getResult(), request);
-                }
+                return makeRequest(task.getResult(), Request.newMeRequest(null, null));
             }
-        }).continueWith(new Continuation<Response, Void>() {
+        }).onSuccess(new Success<Response>() {
             @Override
-            public Void then(final Task<Response> task) throws Exception {
-                if (task.isFaulted()) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCancelled();
-                        }
-                    });
-                } else {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.onCompleted(task.getResult());
-                        }
-                    });
-                }
-
-                return null;
+            public void success(final Task<Response> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCompleted(task.getResult());
+                    }
+                });
+            }
+        }).continueWith(new Failed<Void>() {
+            @Override
+            public void fault(Task<Void> task) throws Exception {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCancelled();
+                    }
+                });
             }
         });
     }
@@ -283,22 +280,13 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
         getSession().closeAndClearTokenInformation();
     }
 
-    private void toast(final String text) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private Task<Response> checkSession() {
         return Task.callInBackground(new Callable<Response>() {
             @Override
             public Response call() throws Exception {
                 Session session = getSession();
                 if (session != null && session.isOpened()) {
-                    Response response = Request.newMeRequest(session, null).executeAndWait();
+                    Response response = new Request(session, "/me?fields=id").executeAndWait();
                     FacebookRequestError error = response.getError();
                     if (error != null) {
                         FacebookErrorCode code = FacebookErrorCode.get(error.getErrorCode());
@@ -317,6 +305,7 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
     }
 
     private Task<Session> openSession(Session session) {
+        checkActivity();
         final Task<Session>.TaskCompletionSource source = Task.<Session>create();
 
         if (session == null || session.isClosed()) {
@@ -348,7 +337,45 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
         return source.getTask();
     }
 
+    private Task<Session> requestForPublish(final Session session, final boolean publish, final String... newPermissions) {
+        checkActivity();
+        final Task<Session>.TaskCompletionSource source = Task.<Session>create();
+
+        List<String> permissions = session.getPermissions();
+        if (permissions.containsAll(Arrays.asList(newPermissions))) {
+            source.trySetResult(session);
+        } else
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Session.NewPermissionsRequest request = new Session.NewPermissionsRequest(FacebookPluginFragment.this, newPermissions);
+                    request.setRequestCode(REQUEST_CODE);
+                    request.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
+                    request.setCallback(new Session.StatusCallback() {
+                        @Override
+                        public void call(Session session, SessionState state, Exception exception) {
+                            if (state.isClosed()) {
+                                source.trySetError(exception);
+                            } else if (state.isOpened()) {
+                                source.trySetResult(session);
+                            }
+
+                        }
+                    });
+
+                    if (publish) {
+                        session.requestNewPublishPermissions(request);
+                    } else {
+                        session.requestNewReadPermissions(request);
+                    }
+                }
+            });
+
+        return source.getTask();
+    }
+
     private Task<Response> makeRequest(final Session session, final Request request) {
+        checkActivity();
         return Task.callInBackground(new Callable<Response>() {
             @Override
             public Response call() throws Exception {
@@ -367,5 +394,9 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
                 return response;
             }
         });
+    }
+
+    private void checkActivity() {
+        if (getActivity() == null) throw new IllegalStateException("task cancelled because activity was removed");
     }
 }

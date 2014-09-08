@@ -45,8 +45,15 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Request Me"
+        android:text="Test Request 2"
         android:id="@+id/btn_request2"
+        android:onClick="onClick" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test Request Me"
+        android:id="@+id/btn_request3"
         android:onClick="onClick" />
 
 </LinearLayout>
