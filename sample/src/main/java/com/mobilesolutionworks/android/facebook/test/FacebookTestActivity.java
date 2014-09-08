@@ -41,6 +41,13 @@ public class FacebookTestActivity extends FragmentActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_facebook_test);
 
+        findViewById(R.id.btn_open).setOnClickListener(this);
+        findViewById(R.id.btn_validate).setOnClickListener(this);
+        findViewById(R.id.btn_close).setOnClickListener(this);
+        findViewById(R.id.btn_request1).setOnClickListener(this);
+        findViewById(R.id.btn_request2).setOnClickListener(this);
+        findViewById(R.id.btn_request3).setOnClickListener(this);
+
         Session.openActiveSessionFromCache(this);
 
         FacebookPluginFragment fragment = new FacebookPluginFragment();

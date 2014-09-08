@@ -30,10 +30,24 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        findViewById(R.id.btn_start).setOnClickListener(this);
+        findViewById(R.id.btn_start2).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        startActivity(new Intent("FACEBOOK_TEST"));
+
+        switch (v.getId()) {
+            case R.id.btn_start: {
+                startActivity(new Intent("FACEBOOK_TEST"));
+                break;
+            }
+
+            case R.id.btn_start2: {
+                startActivity(new Intent("FACEBOOK_FRAGMENT_TEST"));
+                break;
+            }
+        }
     }
 }

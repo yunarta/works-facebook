@@ -2,58 +2,53 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_width="match_parent" android:layout_height="match_parent"
     tools:context=".FacebookTestActivity">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Facebook Status"
         android:id="@+id/status"
-        android:padding="5dp" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Open Session"
+        android:padding="5dp"
+        android:text="Facebook Status"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
         android:id="@+id/btn_open"
-        android:onClick="onClick" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Validate Session"
+        android:text="Open Session" />
+
+    <Button
         android:id="@+id/btn_validate"
-        android:onClick="onClick" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Close Session"
+        android:text="Validate Session" />
+
+    <Button
         android:id="@+id/btn_close"
-        android:onClick="onClick" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Request"
+        android:text="Close Session" />
+
+    <Button
         android:id="@+id/btn_request1"
-        android:onClick="onClick" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Request 2"
+        android:text="Test Request" />
+
+    <Button
         android:id="@+id/btn_request2"
-        android:onClick="onClick" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Request Me"
+        android:text="Test Request 2" />
+
+    <Button
         android:id="@+id/btn_request3"
-        android:onClick="onClick" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test Request Me" />
 
 </LinearLayout>
