@@ -16,6 +16,7 @@
 
 package com.mobilesolutionworks.android.facebook;
 
+import android.support.annotation.NonNull;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
@@ -39,21 +40,15 @@ public interface WorksFacebook {
         void onCompleted(Response response);
     }
 
-    /**
-     * Open facebook session.
-     */
-    void open(WorksFacebook.Callback callback);
+    void open(@NonNull WorksFacebook.Callback callback);
 
-    /**
-     * Validate current session.
-     */
-    void validate(WorksFacebook.Callback callback);
+    void validate(@NonNull WorksFacebook.Callback callback);
 
-    void requestMe(WorksFacebook.ResponseCallback callback);
+    void requestMe(@NonNull WorksFacebook.ResponseCallback callback);
 
-    void readRequest(Request request, WorksFacebook.ResponseCallback callback, String ... newPermissions);
+    void readRequest(Request request, @NonNull WorksFacebook.ResponseCallback callback, String... newPermissions);
 
-    void publishRequest(Request request, WorksFacebook.ResponseCallback callback, String ... newPermissions);
+    void publishRequest(Request request, @NonNull WorksFacebook.ResponseCallback callback, String... newPermissions);
 
     void close();
 }

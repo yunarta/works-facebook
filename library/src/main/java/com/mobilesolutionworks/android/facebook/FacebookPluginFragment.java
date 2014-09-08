@@ -241,6 +241,7 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
         });
     }
 
+    @Override
     public void requestMe(@NonNull final WorksFacebook.ResponseCallback callback) {
         checkSession().onSuccessTask(new Continuation<Response, Task<Session>>() {
             @Override
