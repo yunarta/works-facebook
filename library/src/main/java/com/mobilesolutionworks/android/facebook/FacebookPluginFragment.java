@@ -21,16 +21,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import bolts.Continuation;
-import bolts.Task;
-import com.facebook.*;
+
+import com.facebook.FacebookRequestError;
+import com.facebook.LoggingBehavior;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.SessionLoginBehavior;
+import com.facebook.SessionState;
+import com.facebook.Settings;
+import com.facebook.UiLifecycleHelper;
 import com.mobilesolutionworks.android.facebook.bolts.Ending;
-import com.mobilesolutionworks.android.facebook.bolts.Success;
 import com.mobilesolutionworks.android.facebook.bolts.Failed;
+import com.mobilesolutionworks.android.facebook.bolts.Success;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import bolts.Continuation;
+import bolts.Task;
 
 /**
  * Created by yunarta on 7/9/14.
@@ -315,7 +325,7 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
         }
 
         if (session.isOpened()) {
-            source.setResult(session);
+            source.trySetResult(session);
         } else {
             Session.OpenRequest request = new Session.OpenRequest(FacebookPluginFragment.this);
             request.setPermissions("email");
