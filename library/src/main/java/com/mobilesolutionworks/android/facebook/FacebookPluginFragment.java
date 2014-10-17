@@ -31,12 +31,15 @@ import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.widget.FacebookDialog;
 import com.mobilesolutionworks.android.facebook.bolts.Ending;
 import com.mobilesolutionworks.android.facebook.bolts.Failed;
 import com.mobilesolutionworks.android.facebook.bolts.Success;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import bolts.Continuation;
@@ -50,6 +53,8 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
     protected static final int REQUEST_CODE = 0xfb;
 
     protected UiLifecycleHelper mLifecycleHelper;
+
+    Map<Integer, FacebookDialog.Callback> mFacebookDialogMap;
 
     @Override
     public void onAttach(Activity activity) {
@@ -74,6 +79,7 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
         mLifecycleHelper = new UiLifecycleHelper(getActivity(), null);
         mLifecycleHelper.onCreate(savedInstanceState);
 
+        mFacebookDialogMap = new HashMap<Integer, FacebookDialog.Callback>();
 //        SessionController instance = SessionController.getInstance(getActivity());
 //        Session session = instance.getSession();
 //
@@ -88,12 +94,6 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mLifecycleHelper.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mLifecycleHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -124,6 +124,24 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
 
     protected Session getSession() {
         return Session.getActiveSession();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        FacebookDialog.Callback callback = mFacebookDialogMap.remove(requestCode);
+        if (callback != null) {
+            mLifecycleHelper.onActivityResult(requestCode, resultCode, data, callback);
+        } else {
+            mLifecycleHelper.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void trackPendingDialogCall(FacebookDialog.PendingCall pendingCall, FacebookDialog.Callback callback) {
+        mFacebookDialogMap.put(pendingCall.getRequestCode(), callback);
+        mLifecycleHelper.trackPendingDialogCall(pendingCall);
     }
 
     @Override
@@ -355,7 +373,7 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
         List<String> permissions = session.getPermissions();
         if (permissions.containsAll(Arrays.asList(newPermissions))) {
             source.trySetResult(session);
-        } else
+        } else {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -381,6 +399,7 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
                     }
                 }
             });
+        }
 
         return source.getTask();
     }
@@ -408,6 +427,8 @@ public class FacebookPluginFragment extends Fragment implements WorksFacebook {
     }
 
     private void checkActivity() {
-        if (getActivity() == null) throw new IllegalStateException("task cancelled because activity was removed");
+        if (getActivity() == null) {
+            throw new IllegalStateException("task cancelled because activity was removed");
+        }
     }
 }
