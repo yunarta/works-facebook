@@ -17,14 +17,20 @@
 package com.mobilesolutionworks.android.facebook;
 
 import android.support.annotation.NonNull;
+
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.widget.FacebookDialog;
 
 /**
  * Created by yunarta on 7/9/14.
  */
 public interface WorksFacebook {
+
+    int FACEBOOK_DIALOG_REQUEST_MASK = 0xe000;
+
+    void trackPendingDialogCall(FacebookDialog.PendingCall pendingCall, FacebookDialog.Callback callback);
 
     interface Callback {
 
