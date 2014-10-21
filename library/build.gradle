@@ -40,5 +40,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:20.0.0'
-    compile project(':facebook-android-sdk:facebook')
+    compile 'com.parse.bolts:bolts-android:1.1.+'
+    compile (project(':facebook-android-sdk:facebook')) {
+        exclude group: 'com.parse.bolts', module: 'bolts-android'
+    }
 }
