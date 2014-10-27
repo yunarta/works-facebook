@@ -1,47 +1,37 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.2'
-    }
-}
 apply plugin: 'com.android.library'
 
-repositories {
-    mavenCentral()
-}
-
 android {
-    compileSdkVersion 20
-    buildToolsVersion "20.0.0"
+    compileSdkVersion 21
+    buildToolsVersion "21.0.2"
 
     defaultConfig {
         applicationId "com.mobilesolutionworks.android.facebook"
         minSdkVersion 9
-        targetSdkVersion 20
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
         buildConfigField "String", "MODULE_NAME", '"works-facebook"'
     }
 
     buildTypes {
-        debug {
-
-        }
-
         release {
             runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (runProguard) {
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            }
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-v4:20.0.0'
-    compile 'com.parse.bolts:bolts-android:1.1.+'
-    compile (project(':facebook-android-sdk:facebook')) {
+    def androidSupportVersion = "21.0.0"
+    if (project.hasProperty('androidConfiguration')) {
+        androidSupportVersion = project.androidSupportVersion
+    }
+
+    compile 'com.android.support:support-v4:' + androidSupportVersion
+    compile 'com.parse.bolts:bolts-android:1.1.3'
+    compile ('com.facebook.android:facebook-android-sdk:3.19.1') {
         exclude group: 'com.parse.bolts', module: 'bolts-android'
     }
 }
