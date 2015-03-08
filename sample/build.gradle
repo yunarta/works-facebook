@@ -2,15 +2,24 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.0"
+    buildToolsVersion "21.1.2"
+
+    def androidTargetSdkVersion = compileSdkVersion
+
+    if (project.hasProperty('androidConfiguration')) {
+        compileSdkVersion Integer.parseInt(project.androidCompileSdkVersion)
+        buildToolsVersion project.androidBuildToolsVersion
+        androidTargetSdkVersion = project.androidTargetSdkVersion
+    }
 
     defaultConfig {
-        applicationId "com.mobilesolutionworks.android.facebook"
+        applicationId "com.mobilesolutionworks.android.facebook.test"
         minSdkVersion 9
-        targetSdkVersion 21
+        targetSdkVersion androidTargetSdkVersion
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
 //            runProguard false
