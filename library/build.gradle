@@ -2,12 +2,19 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.0"
+    buildToolsVersion project.androidBuildToolsVersion
+
+    def androidTargetSdkVersion = compileSdkVersion
+
+    if (project.hasProperty('androidConfiguration')) {
+        compileSdkVersion Integer.parseInt(project.androidCompileSdkVersion)
+        buildToolsVersion project.androidBuildToolsVersion
+        androidTargetSdkVersion = project.androidTargetSdkVersion
+    }
 
     defaultConfig {
-        applicationId "com.mobilesolutionworks.android.facebook"
         minSdkVersion 9
-        targetSdkVersion 21
+        targetSdkVersion androidTargetSdkVersion
         versionCode 1
         versionName "1.0"
         buildConfigField "String", "MODULE_NAME", '"works-facebook"'
