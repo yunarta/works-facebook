@@ -50,12 +50,16 @@ public class FacebookTestActivity extends FragmentActivity implements View.OnCli
 
         Session.openActiveSessionFromCache(this);
 
-        FacebookPluginFragment fragment = new FacebookPluginFragment();
-        mFacebook = fragment;
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(fragment, "facebook").commit();
-
+        if (savedInstanceState == null) {
+            FacebookPluginFragment fragment = new FacebookPluginFragment();
+            mFacebook = fragment;
+    
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(fragment, "facebook").commit();
+        } else {
+            mFacebook = (WorksFacebook) getSupportFragmentManager().findFragmentByTag("facebook");
+        }
+        
         mFacebook.validate(new StatusCallback());
     }
 
